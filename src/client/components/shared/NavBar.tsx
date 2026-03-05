@@ -11,6 +11,7 @@ import {
   Mic24Regular,
   BookOpen24Regular,
   DataBarVertical24Regular,
+  Chat24Regular,
 } from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
 const tabs = [
   { value: "/practice", label: "Practice", icon: <Mic24Regular /> },
   { value: "/lessons", label: "Lessons", icon: <BookOpen24Regular /> },
+  { value: "/conversation", label: "Conversation", icon: <Chat24Regular /> },
   { value: "/dashboard", label: "Dashboard", icon: <DataBarVertical24Regular /> },
 ];
 

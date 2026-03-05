@@ -1,27 +1,12 @@
 import { Router, Request, Response } from "express";
-import {
-  SpeechConfig,
-  AudioConfig,
-  SpeechRecognizer,
-  PronunciationAssessmentConfig,
-  PronunciationAssessmentGradingSystem,
-  PronunciationAssessmentGranularity,
-} from "microsoft-cognitiveservices-speech-sdk";
+import { MockPronunciationService } from "../services/mockPronunciationService";
 
 export const speechRouter = Router();
-
-const getSpeechConfig = (): SpeechConfig => {
-  const key = process.env.AZURE_SPEECH_KEY;
-  const region = process.env.AZURE_SPEECH_REGION;
-  if (!key || !region) {
-    throw new Error("Azure Speech credentials not configured");
-  }
-  return SpeechConfig.fromSubscription(key, region);
-};
 
 /**
  * POST /api/speech/assess
  * Accepts audio buffer and reference text, returns pronunciation assessment.
+ * Uses Azure Speech SDK when configured, mock service otherwise.
  */
 speechRouter.post("/assess", async (req: Request, res: Response) => {
   try {
@@ -32,61 +17,80 @@ speechRouter.post("/assess", async (req: Request, res: Response) => {
       return;
     }
 
-    const speechConfig = getSpeechConfig();
-    speechConfig.speechRecognitionLanguage = language;
+    const key = process.env.AZURE_SPEECH_KEY;
+    const region = process.env.AZURE_SPEECH_REGION;
 
-    const pronunciationConfig = new PronunciationAssessmentConfig(
-      referenceText,
-      PronunciationAssessmentGradingSystem.HundredMark,
-      PronunciationAssessmentGranularity.Phoneme,
-      true
-    );
+    if (key && region) {
+      // Use real Azure Speech SDK
+      const {
+        SpeechConfig,
+        AudioConfig,
+        SpeechRecognizer,
+        PronunciationAssessmentConfig,
+        PronunciationAssessmentGradingSystem,
+        PronunciationAssessmentGranularity,
+      } = await import("microsoft-cognitiveservices-speech-sdk");
 
-    // Decode base64 audio data
-    const audioBuffer = Buffer.from(audioData, "base64");
-    const pushStream =
-      AudioConfig.fromWavFileInput(audioBuffer);
+      const speechConfig = SpeechConfig.fromSubscription(key, region);
+      speechConfig.speechRecognitionLanguage = language;
 
-    const recognizer = new SpeechRecognizer(speechConfig, pushStream);
-    pronunciationConfig.applyTo(recognizer);
-
-    const result = await new Promise<Record<string, unknown>>((resolve, reject) => {
-      recognizer.recognizeOnceAsync(
-        (result) => {
-          const pronunciationResult = JSON.parse(
-            result.properties.getProperty("PronunciationAssessment.Result") || "{}"
-          );
-          resolve({
-            text: result.text,
-            scores: {
-              accuracy: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.AccuracyScore ?? 0,
-              fluency: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.FluencyScore ?? 0,
-              completeness: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.CompletenessScore ?? 0,
-              prosody: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.ProsodyScore ?? 0,
-              overall: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.PronScore ?? 0,
-            },
-            words: pronunciationResult.NBest?.[0]?.Words?.map((w: Record<string, unknown>) => ({
-              word: w.Word,
-              accuracy: (w.PronunciationAssessment as Record<string, number>)?.AccuracyScore ?? 0,
-              error: (w.PronunciationAssessment as Record<string, string>)?.ErrorType ?? "None",
-              phonemes: (w.Phonemes as Array<Record<string, unknown>>)?.map(
-                (p: Record<string, unknown>) => ({
-                  phoneme: p.Phoneme,
-                  accuracy: (p.PronunciationAssessment as Record<string, number>)?.AccuracyScore ?? 0,
-                })
-              ),
-            })) ?? [],
-          });
-          recognizer.close();
-        },
-        (error) => {
-          recognizer.close();
-          reject(new Error(error));
-        }
+      const pronunciationConfig = new PronunciationAssessmentConfig(
+        referenceText,
+        PronunciationAssessmentGradingSystem.HundredMark,
+        PronunciationAssessmentGranularity.Phoneme,
+        true
       );
-    });
 
-    res.json(result);
+      const audioBuffer = Buffer.from(audioData, "base64");
+      const pushStream = AudioConfig.fromWavFileInput(audioBuffer);
+      const recognizer = new SpeechRecognizer(speechConfig, pushStream);
+      pronunciationConfig.applyTo(recognizer);
+
+      const result = await new Promise<Record<string, unknown>>((resolve, reject) => {
+        recognizer.recognizeOnceAsync(
+          (result) => {
+            const pronunciationResult = JSON.parse(
+              result.properties.getProperty("PronunciationAssessment.Result") || "{}"
+            );
+            resolve({
+              text: result.text,
+              scores: {
+                accuracy: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.AccuracyScore ?? 0,
+                fluency: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.FluencyScore ?? 0,
+                completeness: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.CompletenessScore ?? 0,
+                prosody: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.ProsodyScore ?? 0,
+                overall: pronunciationResult.NBest?.[0]?.PronunciationAssessment?.PronScore ?? 0,
+              },
+              words: pronunciationResult.NBest?.[0]?.Words?.map((w: Record<string, unknown>) => ({
+                word: w.Word,
+                accuracy: (w.PronunciationAssessment as Record<string, number>)?.AccuracyScore ?? 0,
+                error: (w.PronunciationAssessment as Record<string, string>)?.ErrorType ?? "None",
+                phonemes: (w.Phonemes as Array<Record<string, unknown>>)?.map(
+                  (p: Record<string, unknown>) => ({
+                    phoneme: p.Phoneme,
+                    accuracy: (p.PronunciationAssessment as Record<string, number>)?.AccuracyScore ?? 0,
+                  })
+                ),
+              })) ?? [],
+            });
+            recognizer.close();
+          },
+          (error) => {
+            recognizer.close();
+            reject(new Error(error));
+          }
+        );
+      });
+
+      res.json(result);
+    } else {
+      // Demo mode — use mock service
+      console.log("⚡ Using mock pronunciation assessment (no Azure Speech key)");
+      const mockService = new MockPronunciationService();
+      const audioBuffer = Buffer.from(audioData, "base64");
+      const result = await mockService.assessPronunciation(audioBuffer, referenceText, language);
+      res.json({ ...result, demoMode: true });
+    }
   } catch (error) {
     console.error("Pronunciation assessment error:", error);
     res.status(500).json({ error: "Failed to assess pronunciation" });
