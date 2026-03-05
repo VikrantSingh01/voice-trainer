@@ -2,5 +2,13 @@
     "chat.tools.terminal.autoApprove": {
         "command": true,
         "brew": true
-    }
+    },
+    "json.schemaDownload.enable": true,
+    "http.systemCertificates": true,
+    "json.schemas": [
+        {
+            "fileMatch": ["appPackage/manifest.json"],
+            "url": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json"
+        }
+    ]
 }

@@ -83,6 +83,11 @@ deploy:
     name: install dependencies
     with:
         args: install --no-audit --workspaces=false
+  # Build the React client so Express can serve it via the tunnel on port 3978
+  - uses: cli/runNpmCommand
+    name: build client
+    with:
+        args: run build:client
   # Provides the M365 Agents Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
   - uses: file/createOrUpdateEnvironmentFile
     with:
@@ -100,3 +105,4 @@ deploy:
           AZURE_OPENAI_ENDPOINT: ${{AZURE_OPENAI_ENDPOINT}}
           AZURE_OPENAI_KEY: ${{AZURE_OPENAI_KEY}}
           AZURE_OPENAI_DEPLOYMENT: ${{AZURE_OPENAI_DEPLOYMENT}}
+          USE_MOCK_SERVICES: ${{USE_MOCK_SERVICES}}

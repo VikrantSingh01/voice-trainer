@@ -19,10 +19,10 @@ const isDemoMode =
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Serve static client files in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.resolve(__dirname, "../client")));
-}
+// Serve static client files (built by `npm run build:client` → dist/client/)
+// Always active so the Teams tunnel (port 3978) can serve index.html in all envs.
+const clientDistPath = path.resolve(__dirname, "../../dist/client");
+app.use(express.static(clientDistPath));
 
 // API routes
 app.use("/api/auth", authRouter);
@@ -45,12 +45,10 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// SPA fallback in production
-if (process.env.NODE_ENV === "production") {
-  app.get("*", (_req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/index.html"));
-  });
-}
+// SPA fallback — return index.html for any non-API route so React Router works
+app.get("*", (_req, res) => {
+  res.sendFile(path.resolve(clientDistPath, "index.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`🎤 Voice Trainer server running on port ${PORT}`);
