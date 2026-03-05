@@ -1,0 +1,29 @@
+# Teams Toolkit local development configuration
+version: v1.7
+
+provision:
+  - uses: teamsApp/create
+    with:
+      name: voice-trainer-local
+    writeToEnvironmentFile:
+      teamsAppId: TEAMS_APP_ID
+
+deploy:
+  - uses: devTool/install
+    with:
+      devCert:
+        trust: true
+    writeToEnvironmentFile:
+      sslCertFile: SSL_CRT_FILE
+      sslKeyFile: SSL_KEY_FILE
+
+  - uses: cli/runNpmCommand
+    with:
+      args: install
+
+  - uses: file/createOrUpdateEnvironmentFile
+    with:
+      target: ./env/.env.local
+      envs:
+        TAB_DOMAIN: localhost:3000
+        TAB_ENDPOINT: https://localhost:3000

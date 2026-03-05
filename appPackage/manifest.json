@@ -1,0 +1,51 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.19",
+  "version": "0.1.0",
+  "id": "${{TEAMS_APP_ID}}",
+  "developer": {
+    "name": "Voice Trainer OSS",
+    "websiteUrl": "https://github.com/VikrantSingh01/voice-trainer",
+    "privacyUrl": "https://github.com/VikrantSingh01/voice-trainer/blob/main/PRIVACY.md",
+    "termsOfUseUrl": "https://github.com/VikrantSingh01/voice-trainer/blob/main/LICENSE"
+  },
+  "name": {
+    "short": "Voice Trainer",
+    "full": "Voice Trainer - Pronunciation Training for Non-English Speakers"
+  },
+  "description": {
+    "short": "Practice English pronunciation with AI-powered feedback",
+    "full": "Voice Trainer helps non-English speakers improve their English pronunciation through real-time AI feedback, guided lessons, progress tracking, and interactive conversation practice. Powered by Azure Speech SDK and Azure OpenAI."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#4F6BED",
+  "staticTabs": [
+    {
+      "entityId": "practice",
+      "name": "Practice",
+      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/practice",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "lessons",
+      "name": "Lessons",
+      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/lessons",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "dashboard",
+      "name": "Dashboard",
+      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/dashboard",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["${{TAB_DOMAIN}}"],
+  "webApplicationInfo": {
+    "id": "${{AAD_APP_CLIENT_ID}}",
+    "resource": "api://${{TAB_DOMAIN}}/${{AAD_APP_CLIENT_ID}}"
+  }
+}
