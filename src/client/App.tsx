@@ -4,6 +4,7 @@ import { makeStyles, tokens } from "@fluentui/react-components";
 import { NavBar } from "./components/shared/NavBar";
 import { AuthProvider } from "./components/shared/AuthProvider";
 import { DemoModeBanner } from "./components/shared/DemoModeBanner";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { PracticePanel } from "./components/PracticePanel/PracticePanel";
 import { LessonsPanel } from "./components/LessonsPanel/LessonsPanel";
 import { Dashboard } from "./components/Dashboard/Dashboard";
@@ -18,6 +19,7 @@ const useStyles = makeStyles({
   },
   content: {
     flex: 1,
+    minHeight: 0,
     overflow: "auto",
     padding: "20px",
   },
@@ -34,10 +36,10 @@ const App: React.FC = () => {
           <NavBar />
           <div className={styles.content}>
             <Routes>
-              <Route path="/practice" element={<PracticePanel />} />
-              <Route path="/lessons" element={<LessonsPanel />} />
-              <Route path="/conversation" element={<ConversationPanel />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/practice" element={<ErrorBoundary fallbackLabel="Practice tab error"><PracticePanel /></ErrorBoundary>} />
+              <Route path="/lessons" element={<ErrorBoundary fallbackLabel="Lessons tab error"><LessonsPanel /></ErrorBoundary>} />
+              <Route path="/conversation" element={<ErrorBoundary fallbackLabel="Conversation tab error"><ConversationPanel /></ErrorBoundary>} />
+              <Route path="/dashboard" element={<ErrorBoundary fallbackLabel="Dashboard tab error"><Dashboard /></ErrorBoundary>} />
               <Route path="*" element={<Navigate to="/practice" replace />} />
             </Routes>
           </div>
