@@ -14,7 +14,8 @@ const useStyles = makeStyles({
   root: {
     display: "flex",
     flexDirection: "column",
-    height: "100vh",
+    height: "100%",        // inherits from #root which is 100% of body/html
+    minHeight: "100vh",    // fallback: never collapse even if ancestor height unset
     backgroundColor: tokens.colorNeutralBackground1,
   },
   content: {
