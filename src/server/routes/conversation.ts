@@ -5,6 +5,11 @@ import { MockOpenAIService } from "../services/mockOpenAIService";
 export const conversationRouter = Router();
 
 function getService(): OpenAIService | MockOpenAIService {
+  if (process.env.USE_MOCK_SERVICES === "true") {
+    console.log("⚡ Using mock OpenAI service (USE_MOCK_SERVICES=true)");
+    return new MockOpenAIService();
+  }
+
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const key = process.env.AZURE_OPENAI_KEY;
   const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
