@@ -10,7 +10,7 @@
     "termsOfUseUrl": "https://github.com/VikrantSingh01/voice-trainer/blob/main/LICENSE"
   },
   "name": {
-    "short": "Voice Trainer",
+    "short": "Voice Trainer${{APP_NAME_SUFFIX}}",
     "full": "Voice Trainer - Pronunciation Training for Non-English Speakers"
   },
   "description": {
@@ -26,26 +26,32 @@
     {
       "entityId": "practice",
       "name": "Practice",
-      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/practice",
+      "contentUrl": "${{BOT_ENDPOINT}}/index.html#/practice",
       "scopes": ["personal"]
     },
     {
       "entityId": "lessons",
       "name": "Lessons",
-      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/lessons",
+      "contentUrl": "${{BOT_ENDPOINT}}/index.html#/lessons",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "conversation",
+      "name": "Conversation",
+      "contentUrl": "${{BOT_ENDPOINT}}/index.html#/conversation",
       "scopes": ["personal"]
     },
     {
       "entityId": "dashboard",
       "name": "Dashboard",
-      "contentUrl": "${{TAB_ENDPOINT}}/index.html#/dashboard",
+      "contentUrl": "${{BOT_ENDPOINT}}/index.html#/dashboard",
       "scopes": ["personal"]
     }
   ],
-  "permissions": ["identity", "messageTeamMembers"],
-  "validDomains": ["${{TAB_DOMAIN}}"],
+  "permissions": ["identity"],
+  "validDomains": ["${{BOT_DOMAIN}}"],
   "webApplicationInfo": {
-    "id": "${{AAD_APP_CLIENT_ID}}",
-    "resource": "api://${{TAB_DOMAIN}}/${{AAD_APP_CLIENT_ID}}"
+    "id": "${{BOT_ID}}",
+    "resource": "api://${{BOT_DOMAIN}}/${{BOT_ID}}"
   }
 }
