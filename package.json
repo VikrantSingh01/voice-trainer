@@ -48,7 +48,7 @@
     "uuid": "^11.0.0"
   },
   "devDependencies": {
-    "@microsoft/teamsapp-cli": "^3.0.10",
+    "@microsoft/m365agentstoolkit-cli": "^1.1.4",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",

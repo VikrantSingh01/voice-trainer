@@ -21,11 +21,6 @@ app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Allow microphone access inside Teams iframe
-app.use((_req, res, next) => {
-  res.setHeader("Permissions-Policy", "microphone=*");
-  next();
-});
 
 // Serve static client files (built by `npm run build:client` → dist/client/)
 // Always active so the Teams tunnel (port 3978) can serve index.html in all envs.
