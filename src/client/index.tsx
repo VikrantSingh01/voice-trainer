@@ -17,24 +17,38 @@ function renderApp(theme = teamsLightTheme) {
   );
 }
 
+// Shared promise so useTeamsAuth (and others) can await the same init — no double calls
+export const teamsInitPromise: Promise<boolean> = (async () => {
+  try {
+    await app.initialize();
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 async function initializeApp() {
   // Render immediately — never leave Teams with a blank frame waiting for SDK init
   renderApp();
 
-  try {
-    await app.initialize();
-    // Required: tells Teams to remove its loading overlay and show the app content
+  const inTeams = await teamsInitPromise;
+
+  if (inTeams) {
+    // Tell Teams to remove its loading overlay immediately
     app.notifyAppLoaded();
 
-    const context = await app.getContext();
-    if (context.app.theme === "dark") {
-      // Re-render with correct theme; FluentProvider swaps tokens in place
-      renderApp(teamsDarkTheme);
+    try {
+      const context = await app.getContext();
+      if (context.app.theme === "dark") {
+        renderApp(teamsDarkTheme);
+      }
+    } catch {
+      // Context fetch failed — keep default theme
     }
-    // Required: tells Teams the app is fully ready
+
+    // Tell Teams the app is fully ready
     app.notifySuccess();
-  } catch {
-    // Running outside Teams — already rendered above with default theme
+  } else {
     console.log("Running outside Microsoft Teams");
   }
 }

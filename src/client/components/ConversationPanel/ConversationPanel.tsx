@@ -193,7 +193,7 @@ export const ConversationPanel: React.FC = () => {
     [messages]
   );
 
-  const { isRecording, startRecording, stopRecording } = useAudioRecorder(onRecordingComplete);
+  const { isRecording, startRecording, stopRecording, error: micError } = useAudioRecorder(onRecordingComplete);
 
   return (
     <div className={styles.container}>
@@ -242,6 +242,11 @@ export const ConversationPanel: React.FC = () => {
             </div>
           ))}
           {isLoading && <Spinner size="tiny" label="Thinking..." />}
+          {micError && (
+            <Text style={{ color: tokens.colorPaletteRedForeground1, padding: "8px 0" }}>
+              ⚠️ {micError}
+            </Text>
+          )}
           <div ref={chatEndRef} />
         </div>
 

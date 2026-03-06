@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { app, authentication } from "@microsoft/teams-js";
+import { teamsInitPromise } from "../index";
 
 interface User {
   userId: string;
@@ -15,8 +16,9 @@ export function useTeamsAuth() {
 
   const authenticate = useCallback(async () => {
     try {
-      // Try Teams SSO first
-      await app.initialize();
+      // Reuse the single init from index.tsx — no duplicate initialize() call
+      const inTeams = await teamsInitPromise;
+      if (!inTeams) throw new Error("Not in Teams");
       setIsInTeams(true);
 
       try {

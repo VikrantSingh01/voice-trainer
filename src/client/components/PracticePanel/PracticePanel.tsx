@@ -101,7 +101,7 @@ export const PracticePanel: React.FC = () => {
     [referenceText]
   );
 
-  const { isRecording, startRecording, stopRecording } = useAudioRecorder(onRecordingComplete);
+  const { isRecording, startRecording, stopRecording, error: micError } = useAudioRecorder(onRecordingComplete);
 
   return (
     <div className={styles.container}>
@@ -156,9 +156,9 @@ export const PracticePanel: React.FC = () => {
           </Text>
         </div>
 
-        {error && (
+        {(error || micError) && (
           <Text style={{ color: tokens.colorPaletteRedForeground1, marginTop: "12px" }}>
-            ⚠️ {error}
+            ⚠️ {error || micError}
           </Text>
         )}
       </Card>

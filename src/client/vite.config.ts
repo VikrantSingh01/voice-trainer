@@ -8,6 +8,15 @@ export default defineConfig({
   build: {
     outDir: "../../dist/client",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "fluent": ["@fluentui/react-components", "@fluentui/react-icons"],
+          "teams": ["@microsoft/teams-js"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
   },
   server: {
     port: 3000,

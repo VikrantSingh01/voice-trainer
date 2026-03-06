@@ -48,6 +48,7 @@
       "scopes": ["personal"]
     }
   ],
+  "devicePermissions": ["media"],
   "permissions": ["identity"],
   "validDomains": ["${{BOT_DOMAIN}}"],
   "webApplicationInfo": {

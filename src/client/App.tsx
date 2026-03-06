@@ -1,6 +1,7 @@
 import React from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { makeStyles, tokens } from "@fluentui/react-components";
+import { app } from "@microsoft/teams-js";
 import { NavBar } from "./components/shared/NavBar";
 import { AuthProvider } from "./components/shared/AuthProvider";
 import { DemoModeBanner } from "./components/shared/DemoModeBanner";
@@ -34,7 +35,7 @@ const App: React.FC = () => {
       <HashRouter>
         <div className={styles.root}>
           <DemoModeBanner />
-          <NavBar />
+          {!app.isInitialized() && <NavBar />}
           <div className={styles.content}>
             <Routes>
               <Route path="/practice" element={<ErrorBoundary fallbackLabel="Practice tab error"><PracticePanel /></ErrorBoundary>} />
